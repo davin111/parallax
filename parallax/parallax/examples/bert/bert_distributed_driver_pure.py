@@ -27,7 +27,6 @@ import tokenization
 import tensorflow as tf
 
 import parallax
-import parallax_config
 
 flags = tf.flags
 
@@ -542,14 +541,12 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
 
     return example
 
-  def input_fn(batch_size, num_workers=1, worker_id=0):
+  def input_fn(batch_size):
     """The actual input function."""
 
     # For training, we want a lot of parallel reading and shuffling.
     # For eval, we want no shuffling and parallel reading doesn't matter.
     d = tf.data.TFRecordDataset(input_file)
-    d = d.shard(num_workers, worker_id)
-
     if is_training:
       d = d.repeat()
       d = d.shuffle(buffer_size=100)
@@ -893,6 +890,8 @@ def main(_):
 
   single_gpu_graph = tf.Graph()
   with single_gpu_graph.as_default():
+    global_step = tf.train.get_or_create_global_step()
+
     train_input_fn = file_based_input_fn_builder(
         input_file=train_file,
         seq_length=FLAGS.max_seq_length,
@@ -913,32 +912,23 @@ def main(_):
         use_one_hot_embeddings=FLAGS.use_tpu)
 
     total_loss = model_fn(features)
-    train_op, _ = optimization.create_optimizer(
-        total_loss, FLAGS.learning_rate, num_train_steps, num_warmup_steps, FLAGS.use_tpu)
+    train_op = optimization.create_optimizer(
+        total_loss, FLAGS.learning_rate, num_train_steps, num_warmup_steps, FLAGS.use_tpu, global_step)
 
 
   def run(sess, num_workers, worker_id, num_replicas_per_worker):
-    print('num_workers: {} | worker_id: {}'.format(num_workers, worker_id))
-
-    dataset = train_input_fn(FLAGS.train_batch_size * num_replicas_per_worker, num_workers, worker_id)
-    features = dataset.make_one_shot_iterator().get_next()
-
-    total_loss = model_fn(features)
-    train_op, global_step = optimization.create_optimizer(
-        total_loss, FLAGS.learning_rate, num_train_steps, num_warmup_steps, FLAGS.use_tpu)
-
-
     for i in range(num_train_steps):
       loss, _, _global_step = sess.run([total_loss, train_op, global_step])
       if i % 10 == 0:
         print('global step: {} --- loss: {}'.format(_global_step, loss))
 
 
+
   sess, num_workers, worker_id, num_replicas_per_worker = \
       parallax.parallel_run(single_gpu_graph,
-                            FLAGS.resource_info_file,
-                            sync=True,
-                            parallax_config=parallax_config.build_config())
+                            FLAGS.resource_info_file)
+							#sync=FLAGS.sync,
+							#parallax_config=parallax_config.build_config())
   run(sess, num_workers, worker_id, num_replicas_per_worker)
 
 

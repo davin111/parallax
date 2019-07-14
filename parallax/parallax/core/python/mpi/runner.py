@@ -34,7 +34,7 @@ from parallax.core.python.common.session_context import ParallaxSessionContext
 from parallax.core.python.mpi.graph_transform import graph_transform_mpi
 
 def create_mpi_script(driver_path, args, hostname, gpus, partitions, search,
-                      port=22):
+                      port=7910):
 
     cmd = 'ssh -p %d %s "mkdir -p %s"' % (port, hostname, REMOTE_PARALLAX_ROOT)
     parallax_log.warning(colored('\n$ %s' % cmd, 'red'))

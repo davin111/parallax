@@ -33,7 +33,7 @@ from parallax.core.python.hybrid.graph_transform import graph_transform_hybrid
 from parallax.core.python.ps.runner import launch_ps
 
 def create_mpi_script(driver_path, args, hostname, gpus, resource_info,
-                      machine_id, partitions, search, port=22):
+                      machine_id, partitions, search, port=7910):
     cmd = 'ssh -p %d %s "mkdir -p %s"' % (port, hostname, REMOTE_PARALLAX_ROOT)
     parallax_log.warning(colored('\n$ %s' % cmd, 'red'))
     proc = subprocess.Popen(args=cmd, shell=True)

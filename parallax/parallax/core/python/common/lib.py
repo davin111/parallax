@@ -67,7 +67,7 @@ handler.setFormatter(
 parallax_log.addHandler(handler)
 
 
-def remote_copy(remote_machine, local_path, remote_path, port=22):
+def remote_copy(remote_machine, local_path, remote_path, port=7910):
     cmd = 'ssh -p %d %s "mkdir -p %s"' % (port, remote_machine, remote_path)
     parallax_log.warning(colored('\n$ %s' % cmd, 'red'))
     os.system(cmd)
@@ -82,7 +82,7 @@ def remote_exec(bash_script,
                 stderr=None,
                 env={},
                 python_venv=None,
-                port=22):
+                port=7910):
     full_cmd = ' '.join(
         map(lambda k: 'export %s=%s;' % (k[0], k[1]), env.items()))
     if python_venv is not None:

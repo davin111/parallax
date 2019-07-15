@@ -934,10 +934,10 @@ def main(_):
 
 
     for i in range(num_train_steps):
-      print('[check - {}] before session run'.format(i))
+      print('[check - worker:{} | step:{}] before session run'.format(worker_id, i))
       sys.stdout.flush()
       loss, _, _global_step = sess.run([total_loss, train_op, global_step])
-      print('[check - {}] after session run'.format(i))
+      print('[check - worker:{} | step:{}] after session run'.format(worker_id, i))
       sys.stdout.flush()
 
       if i % 10 == 0:

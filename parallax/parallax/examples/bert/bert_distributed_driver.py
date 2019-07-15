@@ -28,6 +28,7 @@ import tensorflow as tf
 
 import parallax
 import parallax_config
+import sys
 
 flags = tf.flags
 
@@ -467,6 +468,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   assert len(segment_ids) == max_seq_length
 
   label_id = label_map[example.label]
+  """
   if ex_index < 5:
     tf.logging.info("*** Example ***")
     tf.logging.info("guid: %s" % (example.guid))
@@ -476,6 +478,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
     tf.logging.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
     tf.logging.info("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
     tf.logging.info("label: %s (id = %d)" % (example.label, label_id))
+  """
 
   feature = InputFeatures(
       input_ids=input_ids,
@@ -673,6 +676,7 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
       """
       tf.train.init_from_checkpoint(init_checkpoint, assignment_map)
 
+    """
     tf.logging.info("**** Trainable Variables ****")
     for var in tvars:
       init_string = ""
@@ -680,6 +684,7 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
         init_string = ", *INIT_FROM_CKPT*"
       tf.logging.info("  name = %s, shape = %s%s", var.name, var.shape,
                       init_string)
+    """
 
     #output_spec = None
     #if mode == tf.estimator.ModeKeys.TRAIN:
@@ -919,7 +924,7 @@ def main(_):
 
   def run(sess, num_workers, worker_id, num_replicas_per_worker):
     print('num_workers: {} | worker_id: {}'.format(num_workers, worker_id))
-
+    sys.stdout.flush()
     dataset = train_input_fn(FLAGS.train_batch_size * num_replicas_per_worker, num_workers, worker_id)
     features = dataset.make_one_shot_iterator().get_next()
 
@@ -929,7 +934,12 @@ def main(_):
 
 
     for i in range(num_train_steps):
+      print('[check - {}] before session run'.format(i))
+      sys.stdout.flush()
       loss, _, _global_step = sess.run([total_loss, train_op, global_step])
+      print('[check - {}] after session run'.format(i))
+      sys.stdout.flush()
+
       if i % 10 == 0:
         print('global step: {} --- loss: {}'.format(_global_step, loss))
 

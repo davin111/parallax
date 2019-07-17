@@ -22,7 +22,7 @@ flags.DEFINE_boolean('replicate_variables', True, """replicate_variables""")
 flags.DEFINE_string('protocol', 'grpc', """The method for managing variables""")
 tf.app.flags.DEFINE_string('mpirun_options', '',
                            'option for mpirun')
-flags.DEFINE_string('run_option', 'HYBRID',
+flags.DEFINE_string('run_option', 'MPI',
                     'The run option whether PS, MPI or HYBRID')
 flags.DEFINE_string('redirect_path', None, """redirect path to keep the log of distributed workers""")
 flags.DEFINE_integer('save_ckpt_steps', None,

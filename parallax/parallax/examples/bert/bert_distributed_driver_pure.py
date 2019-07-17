@@ -22,7 +22,7 @@ import collections
 import csv
 import os
 import modeling
-import optimization_parallax as optimization
+import optimization_original as optimization
 import tokenization
 import tensorflow as tf
 

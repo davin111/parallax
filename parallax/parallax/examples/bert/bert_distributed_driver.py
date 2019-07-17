@@ -937,7 +937,7 @@ def main(_):
       print("[before session run - worker:{} | global step:{}]".format(worker_id, _global_step))
       sys.stdout.flush()
       loss, _global_step, _ = sess.run([total_loss, global_step, train_op])
-      print("[after session run - worker:{} | global step:{} - loss:{}]".format(worker_id, _global_step, i))
+      print("[after session run - worker:{} | global step:{} - loss:{}]".format(worker_id, _global_step, loss))
       sys.stdout.flush()
 
       if i % 100 == 0:

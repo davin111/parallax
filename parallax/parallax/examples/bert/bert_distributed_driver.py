@@ -932,16 +932,16 @@ def main(_):
     train_op, global_step = optimization.create_optimizer(
         total_loss, FLAGS.learning_rate, num_train_steps, num_warmup_steps, FLAGS.use_tpu)
 
-
+    _global_step = 0
     for i in range(num_train_steps):
-      print('[check - worker:{} | step:{}] before session run'.format(worker_id, i))
+      print("[before session run - worker:{} | global step:{}]".format(worker_id, _global_step))
       sys.stdout.flush()
-      loss, _, _global_step = sess.run([total_loss, train_op, global_step])
-      print('[check - worker:{} | step:{}] after session run'.format(worker_id, i))
+      loss, _global_step, _ = sess.run([total_loss, global_step, train_op])
+      print("[after session run - worker:{} | global step:{} - loss:{}]".format(worker_id, _global_step, i))
       sys.stdout.flush()
 
-      if i % 10 == 0:
-        print('global step: {} --- loss: {}'.format(_global_step, loss))
+      if i % 100 == 0:
+        print('[worker:{} | global step:{} - loss:{}]'.format(worker_id, _global_step, loss))
 
 
   sess, num_workers, worker_id, num_replicas_per_worker = \
